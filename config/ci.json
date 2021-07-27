@@ -1,0 +1,30 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/PremiumCalc.sol": {
+      "urls": ["contracts/PremiumCalc.sol"]
+    },
+    "contracts/test/PremiumCalc.t.sol": {
+      "urls": ["contracts/test/PremiumCalc.t.sol"]
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode"
+        ],
+        "": ["ast"]
+      }
+    },
+    "metadata": {
+      "bytecodeHash": "none"
+    }
+  }
+}
