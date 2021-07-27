@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
 
-import { SafeMath } from "../../../../lib/openzeppelin-contracts/contracts/math/SafeMath.sol";
-
-import { ILoan } from "../../loan/contracts/interfaces/ILoan.sol";
+import { SafeMath } from "../modules/openzeppelin-contracts/contracts/math/SafeMath.sol";
 
 import { IPremiumCalc } from "./interfaces/IPremiumCalc.sol";
+
+interface ILoanWithPrincipalOwed {
+
+    function principalOwed() external view returns (uint256);
+
+}
 
 /// @title PremiumCalc calculates premium fees on Loans.
 contract PremiumCalc is IPremiumCalc {
@@ -22,7 +26,7 @@ contract PremiumCalc is IPremiumCalc {
     }
 
     function getPremiumPayment(address _loan) external override view returns (uint256 total, uint256 principalOwed, uint256 interest) {
-        principalOwed = ILoan(_loan).principalOwed();
+        principalOwed = ILoanWithPrincipalOwed(_loan).principalOwed();
         interest      = principalOwed.mul(premiumFee).div(10_000);
         total         = interest.add(principalOwed);
     }
