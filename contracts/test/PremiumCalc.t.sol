@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.6.11;
-pragma experimental ABIEncoderV2;
 
 import { DSTest } from "../../modules/ds-test/src/test.sol";
 
 import { PremiumCalc } from "../PremiumCalc.sol";
 
-contract LoanWithPrincipalOwed {
+contract MockLoan {
 
     uint256 public principalOwed;
 
@@ -30,47 +29,27 @@ contract PremiumCalcTest is DSTest {
         assertEq(new PremiumCalc(999_999).premiumFee(), 999_999);
     }
 
+    function assert_premiumPayment(
+        uint256 principalOwed,
+        uint256 premiumFee,
+        uint256 expectedTotal,
+        uint256 expectedPrincipalOwed,
+        uint256 expectedInterest
+    ) internal {
+        MockLoan loan           = new MockLoan(principalOwed);
+        PremiumCalc premiumCalc = new PremiumCalc(premiumFee);
+        (uint256 actualTotal, uint256 actualPrincipalOwed, uint256 actualInterest) = premiumCalc.getPremiumPayment(address(loan));
+        assertEq(actualTotal,         expectedTotal);
+        assertEq(actualPrincipalOwed, expectedPrincipalOwed);
+        assertEq(actualInterest,      expectedInterest);
+    }
+
     function test_getPremiumPayment() external {
-        PremiumCalc premiumCalc;
-        LoanWithPrincipalOwed loan;
-        uint256 total;
-        uint256 principalOwed;
-        uint256 interest;
-
-        loan                             = new LoanWithPrincipalOwed(1);
-        premiumCalc                      = new PremiumCalc(1);
-        (total, principalOwed, interest) = premiumCalc.getPremiumPayment(address(loan));
-        assertEq(total,         1);
-        assertEq(principalOwed, 1);
-        assertEq(interest,      0);
-
-        loan                             = new LoanWithPrincipalOwed(10);
-        premiumCalc                      = new PremiumCalc(10);
-        (total, principalOwed, interest) = premiumCalc.getPremiumPayment(address(loan));
-        assertEq(total,         10);
-        assertEq(principalOwed, 10);
-        assertEq(interest,      0);
-
-        loan                             = new LoanWithPrincipalOwed(100);
-        premiumCalc                      = new PremiumCalc(100);
-        (total, principalOwed, interest) = premiumCalc.getPremiumPayment(address(loan));
-        assertEq(total,         101);
-        assertEq(principalOwed, 100);
-        assertEq(interest,      1);
-
-        loan                             = new LoanWithPrincipalOwed(800);
-        premiumCalc                      = new PremiumCalc(500);
-        (total, principalOwed, interest) = premiumCalc.getPremiumPayment(address(loan));
-        assertEq(total,         840);
-        assertEq(principalOwed, 800);
-        assertEq(interest,      40);
-
-        loan                             = new LoanWithPrincipalOwed(0);
-        premiumCalc                      = new PremiumCalc(10_000);
-        (total, principalOwed, interest) = premiumCalc.getPremiumPayment(address(loan));
-        assertEq(total,         0);
-        assertEq(principalOwed, 0);
-        assertEq(interest,      0);
+        assert_premiumPayment(1,   1,      1,   1,   0);
+        assert_premiumPayment(10,  10,     10,  10,  0);
+        assert_premiumPayment(100, 100,    101, 100, 1);
+        assert_premiumPayment(800, 500,    840, 800, 40);
+        assert_premiumPayment(0,   10_000, 0,   0,   0);
     }
 
 }
