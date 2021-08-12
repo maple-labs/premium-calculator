@@ -1,0 +1,8 @@
+name: premium-calculator
+version: 1.0.0
+source: contracts
+packages:
+  - path: contracts/PremiumCalc.sol
+    contractName: PremiumCalc
+    customChecksum: 0xf67b3bdd6074aa39136b57925c05ae5c8906a1a2876cf728ea0e37ca66f547ee
+customDescription: Premium Calculator Artifacts and ABIs
